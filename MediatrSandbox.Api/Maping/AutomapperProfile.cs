@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 
+using MediatrSandbox.Api.Commands;
 using MediatrSandbox.Api.Dtos;
 using MediatrSandbox.Api.Entities;
 
@@ -14,5 +15,7 @@ public class AutomapperProfile : Profile
 
         CreateMap<Item, ItemDto>()
            .ReverseMap();
+
+        CreateMap<CreateItemCommand, Item>();
     }
 }

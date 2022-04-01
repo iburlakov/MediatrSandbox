@@ -1,5 +1,6 @@
 using MediatR;
 
+using MediatrSandbox.Api.Entities;
 using MediatrSandbox.Api.Maping;
 using MediatrSandbox.Api.Repositories;
 
@@ -32,5 +33,10 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// seed
+var itemsRepo = app.Services.GetService<IRepository<Item>>();
+Enumerable.Range(1, 5).ToList().ForEach(i => itemsRepo.Create(new Item { Id = i, Title = $"item {i}", Description = "description" }));
+
 
 app.Run();

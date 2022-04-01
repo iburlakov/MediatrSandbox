@@ -6,14 +6,19 @@ public class InMemoryRepository<T> : IRepository<T> where T : EntityBase
 {
     private readonly IDictionary<int, T> _entities = new Dictionary<int, T>();
 
-    public Task Create(T entity)
+    public Task<T> Create(T entity)
     {
+        if (entity.Id == 0)
+        {
+            entity.Id = _entities.Keys.Max() + 1;
+        }
+
         if (!_entities.TryAdd(entity.Id, entity))
         {
             throw new ArgumentException($"The {typeof(T).Name} with the given Id already exists: {entity.Id}");
         }
 
-        return Task.CompletedTask;
+        return Task.FromResult(entity);
     }
 
     public Task Delete(T entity)
@@ -25,20 +30,14 @@ public class InMemoryRepository<T> : IRepository<T> where T : EntityBase
 
     public Task<T> Get(int id)
     {
-        if (!_entities.TryGetValue(id, out var entity))
-        {
-            throw new ArgumentException($"The {typeof(T).Name} with the given Id not found: {entity.Id}");
-        }
-
+        _entities.TryGetValue(id, out var entity);
+       
         return Task.FromResult(entity);
     }
 
-    public async IAsyncEnumerable<T> GetAll()
+    public Task<IEnumerable<T>> GetAll()
     {
-        foreach (var kvp in await Task.FromResult(_entities))
-        { 
-            yield return kvp.Value;
-        }
+        return Task.FromResult(_entities.Values.AsEnumerable());
     }
 
     public Task Update(T entity)
